@@ -36,7 +36,7 @@ npm run build
 
 The workflow in `.github/workflows/deploy.yml` builds the app and deploys the `dist` folder whenever a commit is pushed to `main`, and can also be run manually from the Actions tab.
 
-If Pages has not been configured yet, open **Settings → Pages** in the repository and choose **GitHub Actions** under Build and deployment. After the workflow succeeds, the site will be available at:
+One-time setup: open [**Settings → Pages**](https://github.com/bradleysouciercomputer/Microsoft-Fluent-2-Testing/settings/pages) and choose **GitHub Actions** under Build and deployment. GitHub does not allow this workflow token to enable Pages itself. Then open **Actions**, select **Deploy to GitHub Pages**, and run the workflow (or push another commit). After deployment succeeds, the site will be available at:
 
 https://bradleysouciercomputer.github.io/Microsoft-Fluent-2-Testing/
 
