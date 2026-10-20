@@ -15,26 +15,26 @@ A personal note-taking workspace built with **React** and Microsoft's **Fluent U
 
 ## Privacy and storage
 
-Notes are stored in this browser's \`localStorage\`. They do not sync to other devices or browsers. Clearing this site's browser storage can remove the notes, so use **Export backup** periodically if the notes matter to you. Importing a backup replaces the notes currently in this browser.
+Notes are stored in this browser's `localStorage`. They do not sync to other devices or browsers. Clearing this site's browser storage can remove the notes, so use **Export backup** periodically if the notes matter to you. Importing a backup replaces the notes currently in this browser.
 
 ## Run locally
 
 Requires Node.js 22 or another Node.js version supported by the installed Vite release.
 
-\`\`\`bash
+```bash
 npm install
 npm run dev
-\`\`\`
+```
 
 Create a production build with:
 
-\`\`\`bash
+```bash
 npm run build
-\`\`\`
+```
 
 ## GitHub Pages
 
-The workflow in \`.github/workflows/deploy.yml\` builds the app and deploys the \`dist\` folder whenever a commit is pushed to \`main\`, and can also be run manually from the Actions tab.
+The workflow in `.github/workflows/deploy.yml` builds the app and deploys the `dist` folder whenever a commit is pushed to `main`, and can also be run manually from the Actions tab.
 
 If Pages has not been configured yet, open **Settings → Pages** in the repository and choose **GitHub Actions** under Build and deployment. After the workflow succeeds, the site will be available at:
 
