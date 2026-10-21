@@ -485,11 +485,11 @@ function App() {
   const noteChars = currentNote ? currentNote.content.length : 0;
   const colors = [
     { id: 'default', label: 'Default', swatch: 'var(--md-sys-color-surface-container)' },
-    { id: 'blue', label: 'Blue', swatch: 'var(--md-sys-color-secondary-container)' },
-    { id: 'yellow', label: 'Yellow', swatch: 'var(--md-sys-color-tertiary-container)' },
-    { id: 'green', label: 'Green', swatch: 'var(--md-sys-color-surface-container-high)' },
-    { id: 'pink', label: 'Pink', swatch: 'var(--md-sys-color-error-container)' },
-    { id: 'purple', label: 'Purple', swatch: 'var(--md-sys-color-primary-container)' }
+    { id: 'blue', label: 'Blue', swatch: 'var(--note-color-blue-container)' },
+    { id: 'yellow', label: 'Yellow', swatch: 'var(--note-color-yellow-container)' },
+    { id: 'green', label: 'Green', swatch: 'var(--note-color-green-container)' },
+    { id: 'pink', label: 'Pink', swatch: 'var(--note-color-pink-container)' },
+    { id: 'purple', label: 'Purple', swatch: 'var(--note-color-purple-container)' }
   ];
 
   return (
