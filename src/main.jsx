@@ -559,7 +559,7 @@ function App() {
               ><Icon name={themeMode === 'dark' ? 'sun' : 'moon'} /></Button>
             </Tooltip>
             <Button appearance="primary" className="new-note-button" onClick={createNote}>
-              <Icon name="add" size={18} /> <Text as="span">New note</Text>
+              <Icon name="add" size={18} /> <Text as="span" className="new-note-label">New note</Text>
             </Button>
           </div>
         </header>
