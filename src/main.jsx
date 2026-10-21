@@ -10,7 +10,10 @@ import {
   Tooltip,
   Select,
   Option,
-  Text
+  Text,
+  Badge,
+  Toast,
+  ToastTitle
 } from '@fluentui/react-components';
 import {
   DocumentRegular,
@@ -138,13 +141,13 @@ function renderInlineMarkdown(text) {
   const tokens = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|~~[^~]+~~)/g);
   return tokens.map((token, index) => {
     if (token.startsWith('**') && token.endsWith('**') && token.length > 4) {
-      return <strong key={index}>{token.slice(2, -2)}</strong>;
+      return <Text as="strong" key={index} weight="semibold">{token.slice(2, -2)}</Text>;
     }
     if (token.startsWith('~~') && token.endsWith('~~') && token.length > 4) {
-      return <del key={index}>{token.slice(2, -2)}</del>;
+      return <Text as="del" key={index}>{token.slice(2, -2)}</Text>;
     }
     if (token.startsWith('*') && token.endsWith('*') && token.length > 2) {
-      return <em key={index}>{token.slice(1, -1)}</em>;
+      return <Text as="em" key={index}>{token.slice(1, -1)}</Text>;
     }
     return token;
   });
@@ -156,22 +159,22 @@ function renderMarkdown(content) {
     if (!line.trim()) return <div className="markdown-blank-line" key={key} aria-hidden="true" />;
     const heading = line.match(/^(#{1,3})\s+(.+)$/);
     if (heading) {
-      const Tag = heading[1].length === 1 ? 'h1' : heading[1].length === 2 ? 'h2' : 'h3';
-      return <Tag className="markdown-heading" key={key}>{renderInlineMarkdown(heading[2])}</Tag>;
+      const level = heading[1].length;
+      return <Text as={level === 1 ? 'h1' : level === 2 ? 'h2' : 'h3'} size={level === 1 ? 500 : level === 2 ? 400 : 300} weight="semibold" className="markdown-heading" key={key}>{renderInlineMarkdown(heading[2])}</Text>;
     }
     const task = line.match(/^\s*-\s+\[([ xX])\]\s*(.*)$/);
     if (task) {
       const checked = task[1].toLowerCase() === 'x';
       return <div className="markdown-task" key={key}>
-        <span className={'markdown-checkbox' + (checked ? ' checked' : '')} aria-label={checked ? 'Completed' : 'Not completed'}>{checked ? '✓' : ''}</span>
-        <span className={checked ? 'markdown-task-done' : ''}>{renderInlineMarkdown(task[2])}</span>
+        <span className={'markdown-checkbox' + (checked ? ' checked' : '')} aria-label={checked ? 'Completed' : 'Not completed'}>{checked ? <Icon name="check" size={12} /> : null}</span>
+        <Text as="span" className={checked ? 'markdown-task-done' : ''}>{renderInlineMarkdown(task[2])}</Text>
       </div>;
     }
     const bullet = line.match(/^\s*[-*]\s+(.+)$/);
-    if (bullet) return <div className="markdown-list-item" key={key}><span aria-hidden="true">•</span><span>{renderInlineMarkdown(bullet[1])}</span></div>;
+    if (bullet) return <div className="markdown-list-item" key={key}><Text as="span" aria-hidden="true">•</Text><Text as="span">{renderInlineMarkdown(bullet[1])}</Text></div>;
     const quote = line.match(/^>\s?(.*)$/);
-    if (quote) return <blockquote className="markdown-quote" key={key}>{renderInlineMarkdown(quote[1])}</blockquote>;
-    return <p className="markdown-paragraph" key={key}>{renderInlineMarkdown(line)}</p>;
+    if (quote) return <Text as="blockquote" className="markdown-quote" key={key}>{renderInlineMarkdown(quote[1])}</Text>;
+    return <Text as="p" className="markdown-paragraph" key={key}>{renderInlineMarkdown(line)}</Text>;
   });
 }
 
@@ -510,11 +513,11 @@ function App() {
   const noteChars = currentNote ? currentNote.content.length : 0;
   const colors = [
     { id: 'default', label: 'Default', swatch: 'var(--colorNeutralBackground1)' },
-    { id: 'blue', label: 'Blue', swatch: '#dcebf8' },
-    { id: 'yellow', label: 'Yellow', swatch: '#fff4ce' },
-    { id: 'green', label: 'Green', swatch: '#dff6dd' },
-    { id: 'pink', label: 'Pink', swatch: '#fde7e9' },
-    { id: 'purple', label: 'Purple', swatch: '#efdefa' }
+    { id: 'blue', label: 'Blue', swatch: 'var(--colorPaletteBlueBackground2)' },
+    { id: 'yellow', label: 'Yellow', swatch: 'var(--colorPaletteYellowBackground2)' },
+    { id: 'green', label: 'Green', swatch: 'var(--colorPaletteGreenBackground2)' },
+    { id: 'pink', label: 'Pink', swatch: 'var(--colorPaletteBerryBackground2)' },
+    { id: 'purple', label: 'Purple', swatch: 'var(--colorPalettePurpleBackground2)' }
   ];
 
   return (
@@ -536,7 +539,7 @@ function App() {
               placeholder="Search notes"
               aria-label="Search notes"
             />
-            <kbd>/</kbd>
+            <Badge appearance="outline" size="small" className="keyboard-badge">/</Badge>
           </div>
           <div className="topbar-actions">
             <span className={'save-indicator' + (storageAvailable ? '' : ' save-warning')}>
@@ -561,7 +564,7 @@ function App() {
           <aside className="sidebar">
             <div className="sidebar-brand">
               <span className="sidebar-brand-icon"><Icon name="notes" size={20} /></span>
-              <div><strong>Your workspace</strong><span>Personal notebook</span></div>
+              <div><Text as="strong" weight="semibold">Your workspace</Text><Text as="span">Personal notebook</Text></div>
             </div>
             <div className="sidebar-section-title">WORKSPACE</div>
             <nav className="nav-list" aria-label="Note views">
@@ -599,13 +602,13 @@ function App() {
                   <Icon name="tag" size={15} /><Text as="span">{tag}</Text>
                   <Text as="span" className="tag-count">{notes.filter((note) => !note.deleted && !note.archived && note.tags.includes(tag)).length}</Text>
                 </Button>
-              )) : <p className="no-tags">Add tags inside a note to organize it here.</p>}
+              )) : <Text as="p" className="no-tags">Add tags inside a note to organize it here.</Text>}
             </div>
 
             <div className="sidebar-bottom">
               <div className="storage-card">
                 <span className="storage-card-icon"><Icon name="file" size={18} /></span>
-                <div><strong>Private by design</strong><span>Your notes stay in this browser.</span></div>
+                <div><Text as="strong" weight="semibold">Private by design</Text><Text as="span">Your notes stay in this browser.</Text></div>
               </div>
               <div className="backup-actions">
                 <Button appearance="subtle" className="backup-button" onClick={exportBackup}>
@@ -616,7 +619,7 @@ function App() {
                 </Button>
                 <input ref={importRef} className="visually-hidden" type="file" accept=".json,application/json" onChange={importBackup} aria-label="Import Fluent Notes backup" />
               </div>
-              <div className="keyboard-tip"><kbd>Ctrl</kbd> + <kbd>N</kbd> <span>New note</span></div>
+              <div className="keyboard-tip"><Badge appearance="outline" size="small" className="keyboard-badge">Ctrl</Badge><Text as="span">+</Text><Badge appearance="outline" size="small" className="keyboard-badge">N</Badge><Text as="span">New note</Text></div>
             </div>
           </aside>
 
@@ -680,8 +683,8 @@ function App() {
               ) : (
                 <div className="list-empty">
                   <div className="empty-icon"><Icon name={query || tagFilter ? 'search' : view === 'trash' ? 'trash' : 'notes'} size={25} /></div>
-                  <strong>{query || tagFilter ? 'No matching notes' : view === 'trash' ? 'Trash is empty' : view === 'archive' ? 'Nothing archived yet' : view === 'favorites' ? 'No favorites yet' : 'Your notebook starts here'}</strong>
-                  <p>{query || tagFilter ? 'Try another search or clear your filter.' : view === 'trash' ? 'Deleted notes will appear here.' : view === 'archive' ? 'Archive notes you want to keep but do not need every day.' : view === 'favorites' ? 'Star a note to keep it close at hand.' : 'Capture a thought, a plan, or anything worth remembering.'}</p>
+                  <Text as="strong" weight="semibold">{query || tagFilter ? 'No matching notes' : view === 'trash' ? 'Trash is empty' : view === 'archive' ? 'Nothing archived yet' : view === 'favorites' ? 'No favorites yet' : 'Your notebook starts here'}</Text>
+                  <Text as="p">{query || tagFilter ? 'Try another search or clear your filter.' : view === 'trash' ? 'Deleted notes will appear here.' : view === 'archive' ? 'Archive notes you want to keep but do not need every day.' : view === 'favorites' ? 'Star a note to keep it close at hand.' : 'Capture a thought, a plan, or anything worth remembering.'}</Text>
                   {view === 'notes' && !query && !tagFilter && <Button appearance="primary" onClick={createNote}><Icon name="add" size={17} /> Create your first note</Button>}
                 </div>
               )}
@@ -830,7 +833,7 @@ function App() {
                     <div className="markdown-preview" aria-label="Formatted note preview">
                       {currentNote.content.trim()
                         ? renderMarkdown(currentNote.content)
-                        : <p className="markdown-empty">Nothing to preview yet. Switch back to Write to add some text.</p>}
+                        : <Text as="p" className="markdown-empty">Nothing to preview yet. Switch back to Write to add some text.</Text>}
                     </div>
                   )}
 
@@ -844,7 +847,7 @@ function App() {
               <div className="editor-empty">
                 <div className="editor-empty-art"><Icon name="notes" size={36} /></div>
                 <Text as="h2" size={500} weight="semibold">{query ? 'Nothing to open' : 'Select a note to get started'}</Text>
-                <p>{query ? 'Try a different search, or create a new note.' : 'Your notes are a quiet place to collect ideas, plans, and little reminders.'}</p>
+                <Text as="p">{query ? 'Try a different search, or create a new note.' : 'Your notes are a quiet place to collect ideas, plans, and little reminders.'}</Text>
                 <Button appearance="primary" onClick={createNote}><Icon name="add" size={17} /> New note</Button>
                 <span className="editor-empty-hint">Your changes save automatically on this device.</span>
               </div>
@@ -852,7 +855,7 @@ function App() {
           </main>
         </div>
 
-        {status && <div className="status-toast" role="status" aria-live="polite"><span className="toast-check"><Icon name="check" size={14} /></span>{status}</div>}
+        {status && <div className="status-toast" role="status" aria-live="polite"><Toast><ToastTitle media={<Icon name="check" size={14} />}>{status}</ToastTitle></Toast></div>}
       </div>
     </FluentProvider>
   );
