@@ -855,7 +855,7 @@ function App() {
           </main>
         </div>
 
-        {status && <div className="status-toast" role="status" aria-live="polite"><Toast><ToastTitle media={<Icon name="check" size={14} />}>{status}</ToastTitle></Toast></div>}
+        {status && <Toast intent="success" className="status-toast" role="status" aria-live="polite"><ToastTitle media={<Icon name="check" size={14} />}>{status}</ToastTitle></Toast>}
       </div>
     </FluentProvider>
   );
