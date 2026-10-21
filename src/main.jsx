@@ -562,7 +562,7 @@ function App() {
         <header className="topbar">
           <div className="topbar-brand">
             <span className="brand-mark"><Icon name="notes" size={22} /></span>
-            <span className="brand-name">Fluent Notes</span>
+            <Text as="span" className="brand-name" weight="semibold">Fluent Notes</Text>
           </div>
           <div className="topbar-search">
             <Icon name="search" size={18} />
@@ -580,7 +580,7 @@ function App() {
           <div className="topbar-actions">
             <span className={'save-indicator' + (storageAvailable ? '' : ' save-warning')}>
               <span className="save-dot" />
-              {storageAvailable ? 'Saved on this device' : 'Storage unavailable'}
+              {storageAvailable ? <Text as="span">Saved on this device</Text> : <Text as="span">Storage unavailable</Text>}
             </span>
             <Tooltip content={themeMode === 'dark' ? 'Use light theme' : 'Use dark theme'} relationship="label">
               <Button
@@ -591,7 +591,7 @@ function App() {
               ><Icon name={themeMode === 'dark' ? 'sun' : 'moon'} /></Button>
             </Tooltip>
             <Button appearance="primary" className="new-note-button" onClick={createNote}>
-              <Icon name="add" size={18} /> <span>New note</span>
+              <Icon name="add" size={18} /> <Text as="span">New note</Text>
             </Button>
           </div>
         </header>
@@ -617,7 +617,7 @@ function App() {
                   onClick={() => changeView(item.id)}
                 >
                   <span className="nav-leading"><Icon name={item.icon} size={18} /></span>
-                  <span className="nav-label">{item.label}</span>
+                  <Text as="span" className="nav-label">{item.label}</Text>
                   <Text as="span" className="nav-count">{item.count || ''}</Text>
                 </Button>
               ))}
@@ -625,7 +625,7 @@ function App() {
 
             <div className="sidebar-divider" />
             <div className="sidebar-section-title tags-section-title">
-              <span>YOUR TAGS</span><Badge appearance="outline" size="small" className="tag-total">{allTags.length}</Badge>
+              <Text as="span">YOUR TAGS</Text><Badge appearance="outline" size="small" className="tag-total">{allTags.length}</Badge>
             </div>
             <div className="tag-list">
               {allTags.length ? allTags.map((tag) => (
@@ -669,7 +669,7 @@ function App() {
                 <Badge appearance="outline" size="small" className="list-total">{visibleNotes.length}</Badge>
               </div>
               <div className="list-tools">
-                <span>{visibleNotes.length === 1 ? '1 note' : visibleNotes.length + ' notes'}</span>
+                <Text as="span">{visibleNotes.length === 1 ? '1 note' : visibleNotes.length + ' notes'}</Text>
                 <Select className="sort-select" size="small" value={sortBy} onChange={(_, data) => setSortBy(data.value)} aria-label="Sort notes">
                   <Option value="updated">Recently edited</Option>
                   <Option value="created">Recently created</Option>
@@ -707,7 +707,7 @@ function App() {
                       </div>
                       <Text as="p" className="note-preview">{previewText(note.content) || 'No additional text'}</Text>
                       <div className="note-item-footer">
-                        <span>{formatShortDate(note.updatedAt)}</span>
+                        <Text as="span">{formatShortDate(note.updatedAt)}</Text>
                         <span className="note-item-tags">
                           {note.tags.slice(0, 2).map((tag) => <Badge appearance="tint" color="subtle" size="small" className="mini-tag" key={tag}>{tag}</Badge>)}
                           {note.tags.length > 2 && <Badge appearance="tint" color="subtle" size="small" className="mini-tag">+{note.tags.length - 2}</Badge>}
@@ -725,7 +725,7 @@ function App() {
                 </div>
               )}
             </div>
-            <div className="list-footer"><span className="footer-sparkle">✦</span> A little space for your thoughts</div>
+            <div className="list-footer"><Text as="span" className="footer-sparkle">✦</Text><Text as="span">A little space for your thoughts</Text></div>
           </section>
 
           <main className="editor-panel" aria-label="Note editor">
@@ -733,7 +733,7 @@ function App() {
               <>
                 <div className="editor-toolbar">
                   <Button appearance="subtle" className="mobile-back icon-button" onClick={() => setMobileShowEditor(false)} aria-label="Back to notes list"><Icon name="back" /></Button>
-                  <div className="editor-status"><span className="status-check"><Icon name="check" size={13} /></span><span>{storageAvailable ? 'Saved locally' : 'Local storage unavailable'}</span></div>
+                  <div className="editor-status"><span className="status-check"><Icon name="check" size={13} /></span><Text as="span">{storageAvailable ? 'Saved locally' : 'Local storage unavailable'}</Text></div>
                   <div className="editor-actions">
                     <Tooltip content={currentNote.pinned ? 'Unpin note' : 'Pin note'} relationship="label">
                       <Button appearance="subtle" className={'icon-button' + (currentNote.pinned ? ' action-active' : '')} onClick={() => updateCurrent({ pinned: !currentNote.pinned })} aria-label={currentNote.pinned ? 'Unpin note' : 'Pin note'}>
@@ -826,7 +826,7 @@ function App() {
                         aria-pressed={editorMode === 'preview'}
                       >
                         <Icon name={editorMode === 'preview' ? 'edit' : 'eye'} size={16} />
-                        <span>{editorMode === 'preview' ? 'Write' : 'Preview'}</span>
+                        <Text as="span">{editorMode === 'preview' ? 'Write' : 'Preview'}</Text>
                       </Button>
                     </div>
                     <div className="color-picker-wrap">
@@ -874,8 +874,8 @@ function App() {
                   )}
 
                   <div className="editor-footer">
-                    <span>{noteWords} {noteWords === 1 ? 'word' : 'words'} <span className="footer-separator">·</span> {noteChars} characters</span>
-                    <span>Stored only in this browser</span>
+                    <Text as="span">{noteWords} {noteWords === 1 ? 'word' : 'words'} <Text as="span" className="footer-separator">·</Text> {noteChars} characters</Text>
+                    <Text as="span">Stored only in this browser</Text>
                   </div>
                 </div>
               </>
@@ -885,7 +885,7 @@ function App() {
                 <Text as="h2" size={500} weight="semibold">{query ? 'Nothing to open' : 'Select a note to get started'}</Text>
                 <Text as="p">{query ? 'Try a different search, or create a new note.' : 'Your notes are a quiet place to collect ideas, plans, and little reminders.'}</Text>
                 <Button appearance="primary" onClick={createNote}><Icon name="add" size={17} /> New note</Button>
-                <span className="editor-empty-hint">Your changes save automatically on this device.</span>
+                <Text as="span" className="editor-empty-hint">Your changes save automatically on this device.</Text>
               </div>
             )}
           </main>
