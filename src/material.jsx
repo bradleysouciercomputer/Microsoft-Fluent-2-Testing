@@ -32,7 +32,8 @@ export function Icon({ name, size = 18, filled = false, className = '' }) {
 export function Button({ appearance = 'subtle', size = 'medium', className = '', children, ...props }) {
   const iconOnly = /(^|\s)(icon-button|format-button|color-choice)(\s|$)/.test(className);
   const tagName = iconOnly ? 'md-icon-button' : appearance === 'outline' ? 'md-outlined-button' : appearance === 'primary' ? 'md-filled-button' : 'md-text-button';
-  return React.createElement(tagName, { ...props, className, 'data-size': size }, children);
+  const content = iconOnly ? children : <span className="m3-button-content">{children}</span>;
+  return React.createElement(tagName, { ...props, className, 'data-size': size }, content);
 }
 
 export function NoteCard({ className = '', onClick, children, ...props }) {
