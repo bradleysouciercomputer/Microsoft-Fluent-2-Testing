@@ -1,48 +1,43 @@
-# Fluent Notes
+# Material Notes
 
-A personal note-taking workspace built with **React** and Microsoft's **Fluent UI React v9** (Fluent 2 design language), published on GitHub Pages.
+A personal notes workspace built with React and Google's official **Material Web** components using the **Material 3** design system. Published on GitHub Pages.
 
 ## Features
 
-- Create, edit, and automatically save notes in your browser.
-- Search titles, note contents, and tags.
-- Organize notes with comma-separated tags and pastel note colors.
-- Pin important notes and mark favorites.
-- Archive notes, restore them, and move notes to trash before permanent deletion.
-- Export all notes as a JSON backup and import a backup later.
-- Light and dark themes, responsive mobile layout, and keyboard shortcuts.
-- Lightweight static hosting: no server, account, or API keys required.
+- Create, edit, and automatically save notes in this browser.
+- Search note titles, body text, and tags.
+- Organize notes with comma-separated tags, color roles, pinning, and favorites.
+- Archive notes, restore them, and move deleted notes to Trash before permanent deletion.
+- Preview Markdown headings, bold, italic, strikethrough, lists, quotations, and interactive checklist items.
+- Light and dark Material 3 color schemes.
+- Export and import JSON backups, with validation of imported IDs, tags, colors, and file size.
+- Responsive desktop and mobile workspace with keyboard shortcuts.
 
 ## Privacy and storage
 
-Notes are stored in this browser's `localStorage`. They do not sync to other devices or browsers. Clearing this site's browser storage can remove the notes, so use **Export backup** periodically if the notes matter to you. Importing a backup replaces the notes currently in this browser.
+Notes are stored in this browser's \`localStorage\`. They do not sync to other devices or browsers. Clearing this site's browser storage can remove notes, so use **Export backup** periodically. Importing a backup replaces the notes currently saved in this browser.
 
 ## Run locally
 
-Requires Node.js 22 or another Node.js version supported by the installed Vite release.
-
-```bash
+\`\`\`bash
 npm install
 npm run dev
-```
+\`\`\`
 
-Create a production build with:
-
-```bash
-npm run build
-```
+Create a production build with \`npm run build\`.
 
 ## GitHub Pages
 
-The workflow in `.github/workflows/deploy.yml` builds the app and deploys the `dist` folder whenever a commit is pushed to `main`, and can also be run manually from the Actions tab.
-
-One-time setup: open [**Settings → Pages**](https://github.com/bradleysouciercomputer/Microsoft-Fluent-2-Testing/settings/pages) and choose **GitHub Actions** under Build and deployment. GitHub does not allow this workflow token to enable Pages itself. Then open **Actions**, select **Deploy to GitHub Pages**, and run the workflow (or push another commit). After deployment succeeds, the site will be available at:
+The workflow in \`.github/workflows/deploy.yml\` builds and deploys the \`dist\` folder on pushes to \`main\`. If needed, set **Settings → Pages → Build and deployment → Source** to **GitHub Actions**.
 
 https://bradleysouciercomputer.github.io/Microsoft-Fluent-2-Testing/
 
-## Design reference
+## Design and implementation
 
-The UI uses Fluent UI React v9 components and follows Microsoft's Fluent 2 guidance for typography, visual hierarchy, spacing, accessible controls, and neutral surfaces.
+- [Google Material 3 design system](https://m3.material.io/)
+- [Google Material Web components](https://github.com/material-components/material-web)
+- [Material Web quick start](https://github.com/material-components/material-web/blob/main/docs/quick-start.md)
 
-- [Fluent 2 React components](https://fluent2.microsoft.design/components/web/react)
-- [Fluent 2 design tokens](https://fluent2.microsoft.design/design-tokens)
+The app uses Material Web's buttons, icon buttons, text fields, select/options, icons, checkboxes, and official typography styles. App-specific layouts and note cards use Material 3 system color and shape roles.
+
+Note: The Material Web repository currently indicates that the project is in maintenance mode pending new maintainers. The app uses the published \`@material/web\` 2.x release range.

@@ -1,7 +1,7 @@
 {
   "name": "microsoft-fluent-2-testing",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,10 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fluentui/react-components": "^9.74.9",
+    "@material/web": "^2.5.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "@fluentui/react-icons": "^2.0.344"
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.0.0",

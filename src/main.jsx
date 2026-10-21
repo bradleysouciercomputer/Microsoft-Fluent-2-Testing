@@ -1,149 +1,40 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import {
-  FluentProvider,
-  webLightTheme,
-  webDarkTheme,
-  Button,
-  Input,
-  Textarea,
-  Tooltip,
-  Select,
-  Option,
-  Text,
-  Badge,
-  Toast,
-  ToastTitle,
-  tokens
-} from '@fluentui/react-components';
-import {
-  DocumentRegular,
-  StarRegular,
-  StarFilled,
-  ArchiveRegular,
-  DeleteRegular,
-  AddRegular,
-  SearchRegular,
-  PinRegular,
-  TagRegular,
-  WeatherMoonRegular,
-  WeatherSunnyRegular,
-  ArrowDownloadRegular,
-  ArrowUploadRegular,
-  ArrowLeftRegular,
-  TextBoldRegular,
-  TextItalicRegular,
-  TextBulletListRegular,
-  CheckboxCheckedRegular,
-  DismissRegular,
-  CheckmarkRegular,
-  ClockRegular,
-  CopyRegular,
-  EyeRegular,
-  EditRegular
-} from '@fluentui/react-icons';
+import { Button, Input, Textarea, Tooltip, Select, Option, Text, Badge, Toast, ToastTitle, Icon, NoteCard } from './material.jsx';
 import './styles.css';
 
 const STORAGE_KEY = 'fluent-notes-v1';
 const THEME_KEY = 'fluent-notes-theme-v1';
 
-const fluentDesignTokens = {
-  '--accent': tokens.colorBrandForeground1,
-  '--accent-background': tokens.colorBrandBackground,
-  '--accent-hover': tokens.colorBrandBackgroundHover,
-  '--text': tokens.colorNeutralForeground1,
-  '--font-family-base': tokens.fontFamilyBase,
-  '--font-size-base-100': tokens.fontSizeBase100,
-  '--font-size-base-200': tokens.fontSizeBase200,
-  '--font-size-base-300': tokens.fontSizeBase300,
-  '--font-size-base-400': tokens.fontSizeBase400,
-  '--font-size-base-500': tokens.fontSizeBase500,
-  '--font-size-base-600': tokens.fontSizeBase600,
-  '--font-size-base-700': tokens.fontSizeBase700,
-  '--font-weight-regular': tokens.fontWeightRegular,
-  '--font-weight-semibold': tokens.fontWeightSemibold,
-  '--font-weight-bold': tokens.fontWeightBold,
-  '--muted': tokens.colorNeutralForeground2,
-  '--subtle': tokens.colorNeutralForeground3,
-  '--line': tokens.colorNeutralStroke1,
-  '--surface': tokens.colorNeutralBackground1,
-  '--surface-soft': tokens.colorNeutralBackground2,
-  '--surface-hover': tokens.colorNeutralBackground1Hover,
-  '--surface-selected': tokens.colorNeutralBackground1Selected,
-  '--surface-3': tokens.colorNeutralBackground3,
-  '--brand-background-soft': tokens.colorBrandBackground2,
-  '--brand-stroke': tokens.colorBrandStroke1,
-  '--foreground-on-brand': tokens.colorNeutralForegroundOnBrand,
-  '--status-success': tokens.colorStatusSuccessForeground1,
-  '--status-danger': tokens.colorStatusDangerForeground1,
-  '--yellow-foreground': tokens.colorPaletteYellowForeground2,
-  '--neutral-background-inverted': tokens.colorNeutralBackgroundInverted,
-  '--neutral-foreground-inverted': tokens.colorNeutralForegroundInverted,
-  '--danger-background': tokens.colorPaletteRedBackground1,
-  '--radius-medium': tokens.borderRadiusMedium,
-  '--radius-small': tokens.borderRadiusSmall,
-  '--radius-large': tokens.borderRadiusLarge,
-  '--shadow': tokens.shadow8,
-  '--shadow-large': tokens.shadow16,
-  '--note-blue': tokens.colorPaletteBlueBackground2,
-  '--note-yellow': tokens.colorPaletteYellowBackground2,
-  '--note-green': tokens.colorPaletteGreenBackground2,
-  '--note-pink': tokens.colorPaletteBerryBackground2,
-  '--note-purple': tokens.colorPalettePurpleBackground2
-};
-
-const iconMap = {
-  notes: DocumentRegular,
-  star: StarRegular,
-  archive: ArchiveRegular,
-  trash: DeleteRegular,
-  add: AddRegular,
-  search: SearchRegular,
-  pin: PinRegular,
-  tag: TagRegular,
-  moon: WeatherMoonRegular,
-  sun: WeatherSunnyRegular,
-  download: ArrowDownloadRegular,
-  upload: ArrowUploadRegular,
-  back: ArrowLeftRegular,
-  bold: TextBoldRegular,
-  italic: TextItalicRegular,
-  list: TextBulletListRegular,
-  checklist: CheckboxCheckedRegular,
-  more: DocumentRegular,
-  close: DismissRegular,
-  check: CheckmarkRegular,
-  file: DocumentRegular,
-  clock: ClockRegular,
-  copy: CopyRegular,
-  eye: EyeRegular,
-  edit: EditRegular,
-  clear: DeleteRegular
-};
-
-function Icon({ name, size = 18, filled = false }) {
-  const IconComponent = name === 'star' && filled ? StarFilled : (iconMap[name] || DocumentRegular);
-  return <IconComponent aria-hidden="true" fontSize={size} className="icon-svg" />;
-}
-
 function safeReadNotes() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter((note) => note && typeof note.id === 'string').map((note) => ({
-      id: note.id,
-      title: typeof note.title === 'string' ? note.title : '',
-      content: typeof note.content === 'string' ? note.content : '',
-      tags: Array.isArray(note.tags) ? note.tags.filter((tag) => typeof tag === 'string') : [],
-      color: typeof note.color === 'string' ? note.color : 'default',
-      favorite: Boolean(note.favorite),
-      pinned: Boolean(note.pinned),
-      archived: Boolean(note.archived),
-      deleted: Boolean(note.deleted),
-      createdAt: note.createdAt || new Date().toISOString(),
-      updatedAt: note.updatedAt || note.createdAt || new Date().toISOString()
-    }));
+    const now = new Date().toISOString();
+    const usedIds = new Set();
+    const allowedColors = new Set(['default', 'blue', 'yellow', 'green', 'pink', 'purple']);
+    return parsed.filter((note) => note && typeof note === 'object').map((note) => {
+      let id = typeof note.id === 'string' && note.id.trim() ? note.id : createId();
+      while (usedIds.has(id)) id = createId();
+      usedIds.add(id);
+      const tags = Array.isArray(note.tags)
+        ? Array.from(new Set(note.tags.filter((tag) => typeof tag === 'string').map((tag) => tag.trim()).filter(Boolean))).slice(0, 12)
+        : [];
+      return {
+        id,
+        title: typeof note.title === 'string' ? note.title : '',
+        content: typeof note.content === 'string' ? note.content : '',
+        tags,
+        color: allowedColors.has(note.color) ? note.color : 'default',
+        favorite: Boolean(note.favorite),
+        pinned: Boolean(note.pinned),
+        archived: Boolean(note.archived),
+        deleted: Boolean(note.deleted),
+        createdAt: typeof note.createdAt === 'string' ? note.createdAt : now,
+        updatedAt: typeof note.updatedAt === 'string' ? note.updatedAt : (typeof note.createdAt === 'string' ? note.createdAt : now)
+      };
+    });
   } catch {
     return [];
   }
@@ -199,7 +90,7 @@ function renderInlineMarkdown(text) {
   });
 }
 
-function renderMarkdown(content) {
+function renderMarkdown(content, onToggleTask) {
   return content.split('\n').map((line, index) => {
     const key = 'line-' + index;
     if (!line.trim()) return <div className="markdown-blank-line" key={key} aria-hidden="true" />;
@@ -212,7 +103,7 @@ function renderMarkdown(content) {
     if (task) {
       const checked = task[1].toLowerCase() === 'x';
       return <div className="markdown-task" key={key}>
-        <span className={'markdown-checkbox' + (checked ? ' checked' : '')} aria-label={checked ? 'Completed' : 'Not completed'}>{checked ? <Icon name="check" size={12} /> : null}</span>
+        <md-checkbox checked={checked} aria-label={checked ? 'Mark task incomplete' : 'Mark task complete'} onInput={() => onToggleTask?.(index, !checked)} />
         <Text as="span" className={checked ? 'markdown-task-done' : ''}>{renderInlineMarkdown(task[2])}</Text>
       </div>;
     }
@@ -355,7 +246,8 @@ function App() {
     setColorMenuOpen(false);
     setStatus('New note created');
     window.setTimeout(() => {
-      if (document.querySelector('.title-input input')) document.querySelector('.title-input input').focus();
+      const titleField = document.querySelector('.title-input');
+      if (titleField && typeof titleField.focus === 'function') titleField.focus();
     }, 40);
   }
 
@@ -455,18 +347,23 @@ function App() {
   }
 
   function insertFormatting(prefix, suffix = '') {
-    if (!currentNote || !bodyRef.current) return;
+    if (!currentNote || !bodyRef.current || editorMode === 'preview') return;
     const field = bodyRef.current;
-    const start = field.selectionStart;
-    const end = field.selectionEnd;
+    const innerEditor = field.shadowRoot?.querySelector('textarea, input');
+    const selectionOwner = typeof field.selectionStart === 'number' ? field : innerEditor;
+    const start = selectionOwner && typeof selectionOwner.selectionStart === 'number' ? selectionOwner.selectionStart : currentNote.content.length;
+    const end = selectionOwner && typeof selectionOwner.selectionEnd === 'number' ? selectionOwner.selectionEnd : start;
     const selection = currentNote.content.slice(start, end);
     const replacement = prefix + selection + suffix;
-    const nextContent = currentNote.content.slice(0, start) + replacement + currentNote.content.slice(end);
-    updateCurrent({ content: nextContent });
+    updateCurrent({ content: currentNote.content.slice(0, start) + replacement + currentNote.content.slice(end) });
     window.requestAnimationFrame(() => {
-      field.focus();
+      field.focus?.();
+      const editor = typeof field.setSelectionRange === 'function' ? field : (field.shadowRoot?.querySelector('textarea, input') || null);
       const cursor = start + prefix.length + selection.length;
-      field.setSelectionRange(cursor, cursor);
+      if (editor && typeof editor.setSelectionRange === 'function') {
+        editor.focus?.();
+        editor.setSelectionRange(cursor, cursor);
+      }
     });
   }
 
@@ -493,6 +390,7 @@ function App() {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
     try {
+      if (file.size > 10 * 1024 * 1024) throw new Error('Backups must be 10 MB or smaller.');
       const parsed = JSON.parse(await file.text());
       const incoming = Array.isArray(parsed) ? parsed : parsed.notes;
       if (!Array.isArray(incoming)) throw new Error('This file does not contain a notes list.');
@@ -558,17 +456,16 @@ function App() {
     : 0;
   const noteChars = currentNote ? currentNote.content.length : 0;
   const colors = [
-    { id: 'default', label: 'Default', swatch: tokens.colorNeutralBackground1 },
-    { id: 'blue', label: 'Blue', swatch: tokens.colorPaletteBlueBackground2 },
-    { id: 'yellow', label: 'Yellow', swatch: tokens.colorPaletteYellowBackground2 },
-    { id: 'green', label: 'Green', swatch: tokens.colorPaletteGreenBackground2 },
-    { id: 'pink', label: 'Pink', swatch: tokens.colorPaletteBerryBackground2 },
-    { id: 'purple', label: 'Purple', swatch: tokens.colorPalettePurpleBackground2 }
+    { id: 'default', label: 'Default', swatch: 'var(--md-sys-color-surface-container)' },
+    { id: 'blue', label: 'Blue', swatch: 'var(--md-sys-color-secondary-container)' },
+    { id: 'yellow', label: 'Yellow', swatch: 'var(--md-sys-color-tertiary-container)' },
+    { id: 'green', label: 'Green', swatch: 'var(--md-sys-color-surface-container-high)' },
+    { id: 'pink', label: 'Pink', swatch: 'var(--md-sys-color-error-container)' },
+    { id: 'purple', label: 'Purple', swatch: 'var(--md-sys-color-primary-container)' }
   ];
 
   return (
-    <FluentProvider theme={themeMode === 'dark' ? webDarkTheme : webLightTheme}>
-      <div className={'app-root theme-' + themeMode} style={fluentDesignTokens}>
+    <div className={'app-root theme-' + themeMode} data-theme={themeMode}>
         <header className="topbar">
           <div className="topbar-brand">
             <span className="brand-mark"><Icon name="notes" size={22} /></span>
@@ -700,10 +597,8 @@ function App() {
               {visibleNotes.length ? (
                 <div className="note-list">
                   {visibleNotes.map((note) => (
-                    <Button
-                      type="button"
+                    <NoteCard
                       key={note.id}
-                      appearance="subtle"
                       className={'note-item color-' + (note.color || 'default') + (selectedId === note.id ? ' note-item-selected' : '')}
                       onClick={() => selectNote(note.id)}
                       aria-current={selectedId === note.id ? 'true' : undefined}
@@ -723,7 +618,7 @@ function App() {
                           {note.tags.length > 2 && <Badge appearance="tint" color="subtle" size="small" className="mini-tag">+{note.tags.length - 2}</Badge>}
                         </span>
                       </div>
-                    </Button>
+                    </NoteCard>
                   ))}
                 </div>
               ) : (
@@ -878,7 +773,13 @@ function App() {
                   ) : (
                     <div className="markdown-preview" aria-label="Formatted note preview">
                       {currentNote.content.trim()
-                        ? renderMarkdown(currentNote.content)
+                        ? renderMarkdown(currentNote.content, (lineIndex, checked) => {
+                            const lines = currentNote.content.split('\n');
+                            const match = lines[lineIndex]?.match(/^(\s*-\s+\[)([ xX])(\]\s*.*)$/);
+                            if (!match) return;
+                            lines[lineIndex] = match[1] + (checked ? 'x' : ' ') + match[3];
+                            updateCurrent({ content: lines.join('\n') });
+                          })
                         : <Text as="p" className="markdown-empty">Nothing to preview yet. Switch back to Write to add some text.</Text>}
                     </div>
                   )}
@@ -902,8 +803,7 @@ function App() {
         </div>
 
         {status && <Toast intent="success" className="status-toast" role="status" aria-live="polite"><ToastTitle media={<Icon name="check" size={14} />}>{status}</ToastTitle></Toast>}
-      </div>
-    </FluentProvider>
+    </div>
   );
 }
 
