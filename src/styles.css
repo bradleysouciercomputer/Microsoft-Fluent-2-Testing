@@ -601,6 +601,12 @@ md-checkbox { --md-checkbox-icon-size: 18px; }
 .color-picker-wrap { position: relative; flex: 0 0 auto; }
 .color-trigger { display: inline-flex; align-items: center; justify-content: center; }
 .color-dot { display: inline-block; width: 16px; height: 16px; border: 1px solid var(--md-sys-color-outline); border-radius: 50%; background: var(--swatch, var(--md-sys-color-surface-container)); }
+.color-dot-default { background: var(--md-sys-color-surface-container); }
+.color-dot-blue { background: var(--note-color-blue-container); }
+.color-dot-yellow { background: var(--note-color-yellow-container); }
+.color-dot-green { background: var(--note-color-green-container); }
+.color-dot-pink { background: var(--note-color-pink-container); }
+.color-dot-purple { background: var(--note-color-purple-container); }
 .color-menu { position: absolute; right: 0; top: 40px; z-index: 10; display: flex; flex-wrap: wrap; gap: 8px; max-width: min(250px, calc(100vw - 32px)); padding: 10px; border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--md-sys-shape-corner-l); background: var(--md-sys-color-surface-container-high); box-shadow: 0 6px 20px rgb(0 0 0 / 16%); }
 .color-picker-wrap .color-choice { display: inline-flex; align-items: center; justify-content: center; width: 32px; min-width: 32px; height: 32px; min-height: 32px; padding: 0; --md-icon-button-container-shape: var(--md-sys-shape-corner-full); --md-icon-button-container-color: var(--swatch); --md-icon-button-icon-color: var(--md-sys-color-on-surface); }
 .color-choice-active { outline: 2px solid var(--md-sys-color-primary); outline-offset: 2px; }
