@@ -153,7 +153,7 @@ function renderMarkdown(content) {
   });
 }
 
-function App()
+function App() {
   const [notes, setNotes] = useState(safeReadNotes);
   const [selectedId, setSelectedId] = useState(() => {
     try { return localStorage.getItem(STORAGE_KEY + '-selected') || ''; } catch { return ''; }
