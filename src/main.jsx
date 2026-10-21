@@ -586,7 +586,7 @@ function App() {
                 >
                   <span className="nav-leading"><Icon name={item.icon} size={18} /></span>
                   <Text as="span" className="nav-label">{item.label}</Text>
-                  <Text as="span" className="nav-count">{item.count || ''}</Text>
+                  {item.count > 0 && <Text as="span" className="nav-count">{item.count}</Text>}
                 </Button>
               ))}
             </nav>
