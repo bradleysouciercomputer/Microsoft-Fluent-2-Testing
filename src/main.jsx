@@ -426,14 +426,19 @@ function App()
       const incoming = Array.isArray(parsed) ? parsed : parsed.notes;
       if (!Array.isArray(incoming)) throw new Error('This file does not contain a notes list.');
       if (!window.confirm('Import this backup and replace the notes currently saved in this browser? Export a backup first if you want to keep a copy.')) return;
+      const usedIds = new Set();
       const imported = incoming.filter((note) => note && typeof note === 'object').map((note) => {
         const now = new Date().toISOString();
+        let id = typeof note.id === 'string' && note.id.trim() ? note.id : createId();
+        while (usedIds.has(id)) id = createId();
+        usedIds.add(id);
+        const allowedColors = ['default', 'blue', 'yellow', 'green', 'pink', 'purple'];
         return {
-          id: typeof note.id === 'string' ? note.id : createId(),
+          id,
           title: typeof note.title === 'string' ? note.title : '',
           content: typeof note.content === 'string' ? note.content : '',
-          tags: Array.isArray(note.tags) ? note.tags.filter((tag) => typeof tag === 'string').slice(0, 12) : [],
-          color: typeof note.color === 'string' ? note.color : 'default',
+          tags: Array.isArray(note.tags) ? Array.from(new Set(note.tags.filter((tag) => typeof tag === 'string').map((tag) => tag.trim()).filter(Boolean))).slice(0, 12) : [],
+          color: allowedColors.includes(note.color) ? note.color : 'default',
           favorite: Boolean(note.favorite), pinned: Boolean(note.pinned),
           archived: Boolean(note.archived), deleted: Boolean(note.deleted),
           createdAt: note.createdAt || now, updatedAt: note.updatedAt || now
