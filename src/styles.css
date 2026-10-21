@@ -389,14 +389,14 @@ button, input, textarea, select { font: inherit; }
 .nav-button .m3-button-content { gap: 8px; }
 
 .topbar {
-  grid-template-columns: minmax(160px, 220px) minmax(180px, 380px) minmax(0, 1fr);
+  grid-template-columns: minmax(160px, 220px) minmax(180px, 340px) minmax(0, 1fr);
   gap: clamp(8px, 1.2vw, 16px);
 }
 .topbar-brand { min-width: 0; }
 .brand-name { overflow: hidden; text-overflow: ellipsis; }
 .topbar-search {
   width: 100%;
-  max-width: 390px;
+  max-width: 340px;
   min-width: 0;
 }
 .search-input {
@@ -430,36 +430,36 @@ button, input, textarea, select { font: inherit; }
 }
 .editor-tags-row {
   width: 100%;
-  max-width: 700px;
+  max-width: 620px;
   min-width: 0;
 }
 .tags-input {
   flex: 1 1 280px;
   width: auto;
   min-width: 0;
-  max-width: min(100%, 560px);
+  max-width: min(100%, 440px);
 }
 .backup-menu .m3-button-content { display: flex; justify-content: flex-start; width: 100%; }
 .new-note-button .m3-button-content { gap: 6px; }
 
 @media (max-width: 1200px) {
   .topbar {
-    grid-template-columns: minmax(145px, 190px) minmax(150px, 320px) minmax(0, 1fr);
+    grid-template-columns: minmax(145px, 190px) minmax(150px, 290px) minmax(0, 1fr);
     gap: 10px;
     padding-left: 14px;
     padding-right: 14px;
   }
-  .topbar-search { max-width: 330px; }
+  .topbar-search { max-width: 290px; }
   .editor-content { max-width: 860px; }
 }
 @media (max-width: 940px) {
   .topbar {
-    grid-template-columns: minmax(120px, 170px) minmax(120px, 250px) minmax(0, 1fr);
+    grid-template-columns: minmax(120px, 170px) minmax(120px, 230px) minmax(0, 1fr);
     gap: 8px;
     padding-left: 12px;
     padding-right: 12px;
   }
-  .topbar-search { max-width: 260px; }
+  .topbar-search { max-width: 230px; }
   .nav-button { --md-text-button-container-height: 36px; }
   .nav-button .m3-button-content,
   .tag-nav-item .m3-button-content { gap: 6px; }
@@ -474,7 +474,7 @@ button, input, textarea, select { font: inherit; }
     padding-left: 10px;
     padding-right: 10px;
   }
-  .topbar-search { max-width: 390px; }
+  .topbar-search { max-width: 340px; }
   .nav-button {
     width: auto;
     min-width: 0;
@@ -488,7 +488,7 @@ button, input, textarea, select { font: inherit; }
   .editor-content { padding-left: 14px; padding-right: 14px; }
   .editor-tags-row { max-width: 100%; }
   .tags-input { max-width: 100%; }
-  .new-note-button .m3-button-content { width: 40px; }
+  .new-note-button .m3-button-content { width: auto; }
 }
 @media (max-width: 440px) {
   .topbar-search { max-width: 100%; }
@@ -496,6 +496,6 @@ button, input, textarea, select { font: inherit; }
   .topbar .brand-mark { width: 34px; height: 34px; }
   .topbar-actions { gap: 0; }
   .new-note-button { min-width: 40px; }
-  .new-note-button .m3-button-content { width: 36px; }
+  .new-note-button .m3-button-content { width: auto; }
   .list-tools { gap: 6px; }
 }
