@@ -13,7 +13,8 @@ import {
   Text,
   Badge,
   Toast,
-  ToastTitle
+  ToastTitle,
+  tokens
 } from '@fluentui/react-components';
 import {
   DocumentRegular,
@@ -45,6 +46,38 @@ import './styles.css';
 
 const STORAGE_KEY = 'fluent-notes-v1';
 const THEME_KEY = 'fluent-notes-theme-v1';
+
+const fluentDesignTokens = {
+  '--accent': tokens.colorBrandForeground1,
+  '--accent-background': tokens.colorBrandBackground,
+  '--accent-hover': tokens.colorBrandBackgroundHover,
+  '--text': tokens.colorNeutralForeground1,
+  '--muted': tokens.colorNeutralForeground2,
+  '--subtle': tokens.colorNeutralForeground3,
+  '--line': tokens.colorNeutralStroke1,
+  '--surface': tokens.colorNeutralBackground1,
+  '--surface-soft': tokens.colorNeutralBackground2,
+  '--surface-hover': tokens.colorNeutralBackground1Hover,
+  '--surface-selected': tokens.colorNeutralBackground1Selected,
+  '--surface-3': tokens.colorNeutralBackground3,
+  '--brand-background-soft': tokens.colorBrandBackground2,
+  '--brand-stroke': tokens.colorBrandStroke1,
+  '--foreground-on-brand': tokens.colorNeutralForegroundOnBrand,
+  '--status-success': tokens.colorStatusSuccessForeground1,
+  '--status-danger': tokens.colorStatusDangerForeground1,
+  '--yellow-foreground': tokens.colorPaletteYellowForeground2,
+  '--neutral-background-inverted': tokens.colorNeutralBackgroundInverted,
+  '--neutral-foreground-inverted': tokens.colorNeutralForegroundInverted,
+  '--radius-medium': tokens.borderRadiusMedium,
+  '--radius-small': tokens.borderRadiusSmall,
+  '--shadow': tokens.shadow8,
+  '--shadow-large': tokens.shadow16,
+  '--note-blue': tokens.colorPaletteBlueBackground2,
+  '--note-yellow': tokens.colorPaletteYellowBackground2,
+  '--note-green': tokens.colorPaletteGreenBackground2,
+  '--note-pink': tokens.colorPaletteBerryBackground2,
+  '--note-purple': tokens.colorPalettePurpleBackground2
+};
 
 const iconMap = {
   notes: DocumentRegular,
@@ -512,17 +545,17 @@ function App() {
     : 0;
   const noteChars = currentNote ? currentNote.content.length : 0;
   const colors = [
-    { id: 'default', label: 'Default', swatch: 'var(--colorNeutralBackground1)' },
-    { id: 'blue', label: 'Blue', swatch: 'var(--colorPaletteBlueBackground2)' },
-    { id: 'yellow', label: 'Yellow', swatch: 'var(--colorPaletteYellowBackground2)' },
-    { id: 'green', label: 'Green', swatch: 'var(--colorPaletteGreenBackground2)' },
-    { id: 'pink', label: 'Pink', swatch: 'var(--colorPaletteBerryBackground2)' },
-    { id: 'purple', label: 'Purple', swatch: 'var(--colorPalettePurpleBackground2)' }
+    { id: 'default', label: 'Default', swatch: tokens.colorNeutralBackground1 },
+    { id: 'blue', label: 'Blue', swatch: tokens.colorPaletteBlueBackground2 },
+    { id: 'yellow', label: 'Yellow', swatch: tokens.colorPaletteYellowBackground2 },
+    { id: 'green', label: 'Green', swatch: tokens.colorPaletteGreenBackground2 },
+    { id: 'pink', label: 'Pink', swatch: tokens.colorPaletteBerryBackground2 },
+    { id: 'purple', label: 'Purple', swatch: tokens.colorPalettePurpleBackground2 }
   ];
 
   return (
     <FluentProvider theme={themeMode === 'dark' ? webDarkTheme : webLightTheme}>
-      <div className={'app-root theme-' + themeMode}>
+      <div className={'app-root theme-' + themeMode} style={fluentDesignTokens}>
         <header className="topbar">
           <div className="topbar-brand">
             <span className="brand-mark"><Icon name="notes" size={22} /></span>
@@ -582,14 +615,14 @@ function App() {
                 >
                   <span className="nav-leading"><Icon name={item.icon} size={18} /></span>
                   <span className="nav-label">{item.label}</span>
-                  <span className="nav-count">{item.count || ''}</span>
+                  <Text as="span" className="nav-count">{item.count || ''}</Text>
                 </Button>
               ))}
             </nav>
 
             <div className="sidebar-divider" />
             <div className="sidebar-section-title tags-section-title">
-              <span>YOUR TAGS</span><span className="tag-total">{allTags.length}</span>
+              <span>YOUR TAGS</span><Badge appearance="outline" size="small" className="tag-total">{allTags.length}</Badge>
             </div>
             <div className="tag-list">
               {allTags.length ? allTags.map((tag) => (
@@ -630,7 +663,7 @@ function App() {
                   <div className="eyebrow">{tagFilter ? 'TAGGED NOTES' : 'YOUR NOTEBOOK'}</div>
                   <Text as="h1" size={500} weight="semibold" className="page-title">{pageTitle}</Text>
                 </div>
-                <span className="list-total">{visibleNotes.length}</span>
+                <Badge appearance="outline" size="small" className="list-total">{visibleNotes.length}</Badge>
               </div>
               <div className="list-tools">
                 <span>{visibleNotes.length === 1 ? '1 note' : visibleNotes.length + ' notes'}</span>
@@ -673,8 +706,8 @@ function App() {
                       <div className="note-item-footer">
                         <span>{formatShortDate(note.updatedAt)}</span>
                         <span className="note-item-tags">
-                          {note.tags.slice(0, 2).map((tag) => <span className="mini-tag" key={tag}>{tag}</span>)}
-                          {note.tags.length > 2 && <span className="mini-tag">+{note.tags.length - 2}</span>}
+                          {note.tags.slice(0, 2).map((tag) => <Badge appearance="tint" color="subtle" size="small" className="mini-tag" key={tag}>{tag}</Badge>)}
+                          {note.tags.length > 2 && <Badge appearance="tint" color="subtle" size="small" className="mini-tag">+{note.tags.length - 2}</Badge>}
                         </span>
                       </div>
                     </Button>
