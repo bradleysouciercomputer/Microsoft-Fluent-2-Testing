@@ -7,52 +7,74 @@ import {
   Button,
   Input,
   Textarea,
-  Tooltip
+  Tooltip,
+  Select,
+  Option,
+  Text
 } from '@fluentui/react-components';
+import {
+  DocumentRegular,
+  StarRegular,
+  StarFilled,
+  ArchiveRegular,
+  DeleteRegular,
+  AddRegular,
+  SearchRegular,
+  PinRegular,
+  TagRegular,
+  WeatherMoonRegular,
+  WeatherSunnyRegular,
+  ArrowDownloadRegular,
+  ArrowUploadRegular,
+  ArrowLeftRegular,
+  TextBoldRegular,
+  TextItalicRegular,
+  TextBulletListRegular,
+  CheckboxCheckedRegular,
+  DismissRegular,
+  CheckmarkRegular,
+  ClockRegular,
+  CopyRegular,
+  EyeRegular,
+  EditRegular
+} from '@fluentui/react-icons';
 import './styles.css';
 
 const STORAGE_KEY = 'fluent-notes-v1';
 const THEME_KEY = 'fluent-notes-theme-v1';
 
-const iconParts = {
-  notes: <><rect x="4" y="3.5" width="15.5" height="17" rx="2" /><path d="M8 8h7.5M8 11.5h7.5M8 15h5" /></>,
-  star: <path d="m12 3.4 2.65 5.37 5.93.86-4.29 4.18 1.01 5.91L12 16.93l-5.3 2.79 1.01-5.91-4.29-4.18 5.93-.86L12 3.4Z" />,
-  archive: <><path d="M4 7.5h16v12H4z" /><path d="M3 3.5h18v4H3zM9 11.5h6" /></>,
-  trash: <><path d="M4.5 6.5h15M9 6.5V4h6v2.5M7 6.5l1 13h8l1-13M10 10v6M14 10v6" /></>,
-  add: <><path d="M12 5v14M5 12h14" /></>,
-  search: <><circle cx="10.8" cy="10.8" r="6.3" /><path d="m15.5 15.5 4.2 4.2" /></>,
-  pin: <><path d="m8 4 8 0-1.4 5 3 3v2h-5.1v6l-1 1-1-1v-6H5.5v-2l3-3L8 4Z" /></>,
-  tag: <><path d="M3.5 12V5.5h6.7L20 15.3 15.3 20l-9.8-9.8Z" /><circle cx="7.5" cy="7.5" r="1" /></>,
-  moon: <path d="M19.5 14A7.7 7.7 0 0 1 10 4.5 8.2 8.2 0 1 0 19.5 14Z" />,
-  sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2M12 19.5v2M4.7 4.7l1.4 1.4m11.8 11.8 1.4 1.4M2.5 12h2m15 0h2M4.7 19.3l1.4-1.4M17.9 6.1l1.4-1.4" /></>,
-  download: <><path d="M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5M4 18.5v2h16v-2" /></>,
-  upload: <><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M4 18.5v2h16v-2" /></>,
-  back: <><path d="M19 12H5M11 6l-6 6 6 6" /></>,
-  bold: <><path d="M7 4h6a4 4 0 0 1 0 8H7zM7 12h7a4 4 0 0 1 0 8H7z" /></>,
-  italic: <><path d="M14 4h-5M15 20h-5M14 4 10 20" /></>,
-  list: <><path d="M9 6h11M9 12h11M9 18h11" /><path d="M4 6h.01M4 12h.01M4 18h.01" /></>,
-  checklist: <><path d="m3.5 6 1.5 1.5L7.5 5M9.5 6h11M3.5 12l1.5 1.5 2.5-2.5M9.5 12h11M3.5 18l1.5 1.5 2.5-2.5M9.5 18h11" /></>,
-  more: <><circle cx="5" cy="12" r="1" fill="currentColor" /><circle cx="12" cy="12" r="1" fill="currentColor" /><circle cx="19" cy="12" r="1" fill="currentColor" /></>,
-  close: <><path d="m6 6 12 12M18 6 6 18" /></>,
-  check: <path d="m4.5 12.5 5 5 10-11" />,
-  file: <><path d="M6 3.5h8l4 4v13H6z" /><path d="M14 3.5v4h4M9 12h6M9 15.5h6" /></>,
-  clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></>,
-  copy: <><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2H8" /></>,
-  eye: <><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z" /><circle cx="12" cy="12" r="2.5" /></>,
-  edit: <><path d="m4 16.5-.8 4.3 4.3-.8L19 8.5 15.5 5 4 16.5Z" /><path d="m13.8 6.7 3.5 3.5" /></>,
-  clear: <><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 10v6M14 10v6" /></>
+const iconMap = {
+  notes: DocumentRegular,
+  star: StarRegular,
+  archive: ArchiveRegular,
+  trash: DeleteRegular,
+  add: AddRegular,
+  search: SearchRegular,
+  pin: PinRegular,
+  tag: TagRegular,
+  moon: WeatherMoonRegular,
+  sun: WeatherSunnyRegular,
+  download: ArrowDownloadRegular,
+  upload: ArrowUploadRegular,
+  back: ArrowLeftRegular,
+  bold: TextBoldRegular,
+  italic: TextItalicRegular,
+  list: TextBulletListRegular,
+  checklist: CheckboxCheckedRegular,
+  more: DocumentRegular,
+  close: DismissRegular,
+  check: CheckmarkRegular,
+  file: DocumentRegular,
+  clock: ClockRegular,
+  copy: CopyRegular,
+  eye: EyeRegular,
+  edit: EditRegular,
+  clear: DeleteRegular
 };
 
 function Icon({ name, size = 18, filled = false }) {
-  return (
-    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"
-      className="icon-svg">
-      {name === 'star' && filled
-        ? <path d="m12 3.4 2.65 5.37 5.93.86-4.29 4.18 1.01 5.91L12 16.93l-5.3 2.79 1.01-5.91-4.29-4.18 5.93-.86L12 3.4Z" fill="currentColor" />
-        : iconParts[name] || iconParts.notes}
-    </svg>
-  );
+  const IconComponent = name === 'star' && filled ? StarFilled : (iconMap[name] || DocumentRegular);
+  return <IconComponent aria-hidden="true" fontSize={size} className="icon-svg" />;
 }
 
 function safeReadNotes() {
@@ -568,14 +590,15 @@ function App() {
             </div>
             <div className="tag-list">
               {allTags.length ? allTags.map((tag) => (
-                <button
+                <Button
                   key={tag}
+                  appearance="subtle"
                   className={'tag-nav-item' + (tagFilter === tag ? ' tag-nav-selected' : '')}
                   onClick={() => { setView('notes'); setTagFilter(tag); setSelectedId(''); setMobileShowEditor(false); }}
                 >
-                  <Icon name="tag" size={15} /><span>{tag}</span>
-                  <span className="tag-count">{notes.filter((note) => !note.deleted && !note.archived && note.tags.includes(tag)).length}</span>
-                </button>
+                  <Icon name="tag" size={15} /><Text as="span">{tag}</Text>
+                  <Text as="span" className="tag-count">{notes.filter((note) => !note.deleted && !note.archived && note.tags.includes(tag)).length}</Text>
+                </Button>
               )) : <p className="no-tags">Add tags inside a note to organize it here.</p>}
             </div>
 
@@ -602,17 +625,17 @@ function App() {
               <div className="list-title-row">
                 <div>
                   <div className="eyebrow">{tagFilter ? 'TAGGED NOTES' : 'YOUR NOTEBOOK'}</div>
-                  <h1>{pageTitle}</h1>
+                  <Text as="h1" size={500} weight="semibold" className="page-title">{pageTitle}</Text>
                 </div>
                 <span className="list-total">{visibleNotes.length}</span>
               </div>
               <div className="list-tools">
                 <span>{visibleNotes.length === 1 ? '1 note' : visibleNotes.length + ' notes'}</span>
-                <select className="sort-select" value={sortBy} onChange={(event) => setSortBy(event.target.value)} aria-label="Sort notes">
-                  <option value="updated">Recently edited</option>
-                  <option value="created">Recently created</option>
-                  <option value="title">Title A–Z</option>
-                </select>
+                <Select className="sort-select" size="small" value={sortBy} onChange={(_, data) => setSortBy(data.value)} aria-label="Sort notes">
+                  <Option value="updated">Recently edited</Option>
+                  <Option value="created">Recently created</Option>
+                  <Option value="title">Title A–Z</Option>
+                </Select>
               </div>
               {view === 'trash' && counts.trash > 0 && (
                 <div className="trash-clear-row">
@@ -621,28 +644,29 @@ function App() {
                   </Button>
                 </div>
               )}
-              {tagFilter && <button className="active-filter" onClick={() => setTagFilter('')}><Icon name="tag" size={14} /> {tagFilter}<Icon name="close" size={13} /></button>}
+              {tagFilter && <Button appearance="subtle" size="small" className="active-filter" onClick={() => setTagFilter('')}><Icon name="tag" size={14} /> {tagFilter}<Icon name="close" size={13} /></Button>}
             </div>
 
             <div className="notes-scroll">
               {visibleNotes.length ? (
                 <div className="note-list">
                   {visibleNotes.map((note) => (
-                    <button
+                    <Button
                       type="button"
                       key={note.id}
-                      onClick={() => selectNote(note.id)}
+                      appearance="subtle"
                       className={'note-item color-' + (note.color || 'default') + (selectedId === note.id ? ' note-item-selected' : '')}
+                      onClick={() => selectNote(note.id)}
                       aria-current={selectedId === note.id ? 'true' : undefined}
                     >
                       <div className="note-item-heading">
-                        <span className="note-item-title">{note.title.trim() || 'Untitled note'}</span>
+                        <Text as="span" className="note-item-title" weight="semibold">{note.title.trim() || 'Untitled note'}</Text>
                         <span className="note-item-flags">
                           {note.pinned && <Icon name="pin" size={14} />}
                           {note.favorite && <Icon name="star" size={14} filled />}
                         </span>
                       </div>
-                      <p className="note-preview">{previewText(note.content) || 'No additional text'}</p>
+                      <Text as="p" className="note-preview">{previewText(note.content) || 'No additional text'}</Text>
                       <div className="note-item-footer">
                         <span>{formatShortDate(note.updatedAt)}</span>
                         <span className="note-item-tags">
@@ -650,7 +674,7 @@ function App() {
                           {note.tags.length > 2 && <span className="mini-tag">+{note.tags.length - 2}</span>}
                         </span>
                       </div>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               ) : (
@@ -776,14 +800,15 @@ function App() {
                         <div className="color-menu" role="group" aria-label="Choose note color">
                           {colors.map((color) => (
                             <Tooltip key={color.id} content={color.label} relationship="label">
-                              <button
+                              <Button
                                 type="button"
+                                appearance="subtle"
                                 className={'color-choice' + (currentNote.color === color.id ? ' color-choice-active' : '')}
                                 style={{ '--swatch': color.swatch }}
                                 onClick={() => { updateCurrent({ color: color.id }); setColorMenuOpen(false); }}
                                 aria-label={color.label}
                                 aria-pressed={currentNote.color === color.id}
-                              >{currentNote.color === color.id ? <Icon name="check" size={15} /> : null}</button>
+                              >{currentNote.color === color.id ? <Icon name="check" size={15} /> : null}</Button>
                             </Tooltip>
                           ))}
                         </div>
@@ -818,7 +843,7 @@ function App() {
             ) : (
               <div className="editor-empty">
                 <div className="editor-empty-art"><Icon name="notes" size={36} /></div>
-                <h2>{query ? 'Nothing to open' : 'Select a note to get started'}</h2>
+                <Text as="h2" size={500} weight="semibold">{query ? 'Nothing to open' : 'Select a note to get started'}</Text>
                 <p>{query ? 'Try a different search, or create a new note.' : 'Your notes are a quiet place to collect ideas, plans, and little reminders.'}</p>
                 <Button appearance="primary" onClick={createNote}><Icon name="add" size={17} /> New note</Button>
                 <span className="editor-empty-hint">Your changes save automatically on this device.</span>
