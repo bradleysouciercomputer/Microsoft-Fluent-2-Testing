@@ -36,7 +36,11 @@ const iconParts = {
   close: <><path d="m6 6 12 12M18 6 6 18" /></>,
   check: <path d="m4.5 12.5 5 5 10-11" />,
   file: <><path d="M6 3.5h8l4 4v13H6z" /><path d="M14 3.5v4h4M9 12h6M9 15.5h6" /></>,
-  clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></>
+  clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></>,
+  copy: <><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2H8" /></>,
+  eye: <><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z" /><circle cx="12" cy="12" r="2.5" /></>,
+  edit: <><path d="m4 16.5-.8 4.3 4.3-.8L19 8.5 15.5 5 4 16.5Z" /><path d="m13.8 6.7 3.5 3.5" /></>,
+  clear: <><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 10v6M14 10v6" /></>
 };
 
 function Icon({ name, size = 18, filled = false }) {
@@ -108,7 +112,48 @@ function previewText(content) {
     .trim();
 }
 
-function App() {
+function renderInlineMarkdown(text) {
+  const tokens = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|~~[^~]+~~)/g);
+  return tokens.map((token, index) => {
+    if (token.startsWith('**') && token.endsWith('**') && token.length > 4) {
+      return <strong key={index}>{token.slice(2, -2)}</strong>;
+    }
+    if (token.startsWith('~~') && token.endsWith('~~') && token.length > 4) {
+      return <del key={index}>{token.slice(2, -2)}</del>;
+    }
+    if (token.startsWith('*') && token.endsWith('*') && token.length > 2) {
+      return <em key={index}>{token.slice(1, -1)}</em>;
+    }
+    return token;
+  });
+}
+
+function renderMarkdown(content) {
+  return content.split('\n').map((line, index) => {
+    const key = 'line-' + index;
+    if (!line.trim()) return <div className="markdown-blank-line" key={key} aria-hidden="true" />;
+    const heading = line.match(/^(#{1,3})\s+(.+)$/);
+    if (heading) {
+      const Tag = heading[1].length === 1 ? 'h1' : heading[1].length === 2 ? 'h2' : 'h3';
+      return <Tag className="markdown-heading" key={key}>{renderInlineMarkdown(heading[2])}</Tag>;
+    }
+    const task = line.match(/^\s*-\s+\[([ xX])\]\s*(.*)$/);
+    if (task) {
+      const checked = task[1].toLowerCase() === 'x';
+      return <div className="markdown-task" key={key}>
+        <span className={'markdown-checkbox' + (checked ? ' checked' : '')} aria-label={checked ? 'Completed' : 'Not completed'}>{checked ? '✓' : ''}</span>
+        <span className={checked ? 'markdown-task-done' : ''}>{renderInlineMarkdown(task[2])}</span>
+      </div>;
+    }
+    const bullet = line.match(/^\s*[-*]\s+(.+)$/);
+    if (bullet) return <div className="markdown-list-item" key={key}><span aria-hidden="true">•</span><span>{renderInlineMarkdown(bullet[1])}</span></div>;
+    const quote = line.match(/^>\s?(.*)$/);
+    if (quote) return <blockquote className="markdown-quote" key={key}>{renderInlineMarkdown(quote[1])}</blockquote>;
+    return <p className="markdown-paragraph" key={key}>{renderInlineMarkdown(line)}</p>;
+  });
+}
+
+function App()
   const [notes, setNotes] = useState(safeReadNotes);
   const [selectedId, setSelectedId] = useState(() => {
     try { return localStorage.getItem(STORAGE_KEY + '-selected') || ''; } catch { return ''; }
@@ -125,6 +170,7 @@ function App() {
   const [status, setStatus] = useState('');
   const [storageAvailable, setStorageAvailable] = useState(true);
   const [mobileShowEditor, setMobileShowEditor] = useState(false);
+  const [editorMode, setEditorMode] = useState('write');
   const searchRef = useRef(null);
   const bodyRef = useRef(null);
   const importRef = useRef(null);
@@ -234,6 +280,7 @@ function App() {
     setQuery('');
     setSelectedId(note.id);
     setMobileShowEditor(true);
+    setEditorMode('write');
     setColorMenuOpen(false);
     setStatus('New note created');
     window.setTimeout(() => {
@@ -252,7 +299,41 @@ function App() {
   function selectNote(id) {
     setSelectedId(id);
     setMobileShowEditor(true);
+    setEditorMode('write');
     setColorMenuOpen(false);
+  }
+
+  function duplicateCurrent() {
+    if (!currentNote) return;
+    const now = new Date().toISOString();
+    const duplicate = {
+      ...currentNote,
+      id: createId(),
+      title: currentNote.title.trim() ? currentNote.title.trim() + ' (copy)' : 'Untitled note (copy)',
+      favorite: false,
+      pinned: false,
+      archived: false,
+      deleted: false,
+      createdAt: now,
+      updatedAt: now
+    };
+    setNotes((previous) => [duplicate, ...previous]);
+    setView('notes');
+    setTagFilter('');
+    setQuery('');
+    setSelectedId(duplicate.id);
+    setMobileShowEditor(true);
+    setEditorMode('write');
+    setStatus('Note duplicated');
+  }
+
+  function emptyTrash() {
+    if (!counts.trash) return;
+    if (!window.confirm('Permanently delete all ' + counts.trash + ' notes in the trash? This cannot be undone.')) return;
+    setNotes((previous) => previous.filter((note) => !note.deleted));
+    setSelectedId('');
+    setMobileShowEditor(false);
+    setStatus('Trash emptied');
   }
 
   function archiveCurrent() {
@@ -333,7 +414,7 @@ function App() {
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     setStatus('Backup downloaded');
   }
 
@@ -360,6 +441,7 @@ function App() {
       });
       setNotes(imported);
       setSelectedId(imported[0] ? imported[0].id : '');
+      setTagDraft(imported[0] ? imported[0].tags.join(', ') : '');
       setView('notes');
       setTagFilter('');
       setQuery('');
@@ -378,6 +460,9 @@ function App() {
       if (modifier && event.key.toLowerCase() === 'n') {
         event.preventDefault();
         createNote();
+      } else if (modifier && event.shiftKey && event.key.toLowerCase() === 'p') {
+        event.preventDefault();
+        setEditorMode((mode) => mode === 'write' ? 'preview' : 'write');
       } else if (modifier && event.key.toLowerCase() === 's') {
         event.preventDefault();
         setStatus(storageAvailable ? 'Your notes are saved on this device' : 'Browser storage is unavailable');
@@ -524,6 +609,13 @@ function App() {
                   <option value="title">Title A–Z</option>
                 </select>
               </div>
+              {view === 'trash' && counts.trash > 0 && (
+                <div className="trash-clear-row">
+                  <Button appearance="subtle" className="trash-clear-button" onClick={emptyTrash}>
+                    <Icon name="clear" size={15} /> Empty trash
+                  </Button>
+                </div>
+              )}
               {tagFilter && <button className="active-filter" onClick={() => setTagFilter('')}><Icon name="tag" size={14} /> {tagFilter}<Icon name="close" size={13} /></button>}
             </div>
 
@@ -585,6 +677,11 @@ function App() {
                         <Icon name="star" filled={currentNote.favorite} />
                       </Button>
                     </Tooltip>
+                    <Tooltip content="Duplicate note" relationship="label">
+                      <Button appearance="subtle" className="icon-button" onClick={duplicateCurrent} aria-label="Duplicate note">
+                        <Icon name="copy" />
+                      </Button>
+                    </Tooltip>
                     {view === 'trash' ? (
                       <>
                         <Tooltip content="Restore note" relationship="label">
@@ -641,18 +738,28 @@ function App() {
                   <div className="format-toolbar" role="toolbar" aria-label="Text formatting">
                     <div className="format-group">
                       <Tooltip content="Bold (Markdown)" relationship="label">
-                        <Button appearance="subtle" className="format-button" onClick={() => insertFormatting('**', '**')} aria-label="Insert bold markdown"><Icon name="bold" size={17} /></Button>
+                        <Button appearance="subtle" className="format-button" disabled={editorMode === 'preview'} onClick={() => insertFormatting('**', '**')} aria-label="Insert bold markdown"><Icon name="bold" size={17} /></Button>
                       </Tooltip>
                       <Tooltip content="Italic (Markdown)" relationship="label">
-                        <Button appearance="subtle" className="format-button" onClick={() => insertFormatting('*', '*')} aria-label="Insert italic markdown"><Icon name="italic" size={17} /></Button>
+                        <Button appearance="subtle" className="format-button" disabled={editorMode === 'preview'} onClick={() => insertFormatting('*', '*')} aria-label="Insert italic markdown"><Icon name="italic" size={17} /></Button>
                       </Tooltip>
                       <span className="format-divider" />
                       <Tooltip content="Bullet list" relationship="label">
-                        <Button appearance="subtle" className="format-button" onClick={() => insertFormatting('- ')} aria-label="Start a bullet list"><Icon name="list" size={17} /></Button>
+                        <Button appearance="subtle" className="format-button" disabled={editorMode === 'preview'} onClick={() => insertFormatting('- ')} aria-label="Start a bullet list"><Icon name="list" size={17} /></Button>
                       </Tooltip>
                       <Tooltip content="Checklist" relationship="label">
-                        <Button appearance="subtle" className="format-button" onClick={() => insertFormatting('- [ ] ')} aria-label="Start a checklist"><Icon name="checklist" size={17} /></Button>
+                        <Button appearance="subtle" className="format-button" disabled={editorMode === 'preview'} onClick={() => insertFormatting('- [ ] ')} aria-label="Start a checklist"><Icon name="checklist" size={17} /></Button>
                       </Tooltip>
+                      <Button
+                        appearance="subtle"
+                        className={'format-preview-button' + (editorMode === 'preview' ? ' preview-active' : '')}
+                        onClick={() => setEditorMode((mode) => mode === 'write' ? 'preview' : 'write')}
+                        aria-label={editorMode === 'preview' ? 'Switch to writing mode' : 'Preview formatted note'}
+                        aria-pressed={editorMode === 'preview'}
+                      >
+                        <Icon name={editorMode === 'preview' ? 'edit' : 'eye'} size={16} />
+                        <span>{editorMode === 'preview' ? 'Write' : 'Preview'}</span>
+                      </Button>
                     </div>
                     <div className="color-picker-wrap">
                       <Tooltip content="Note color" relationship="label">
@@ -679,15 +786,23 @@ function App() {
                     </div>
                   </div>
 
-                  <Textarea
-                    ref={bodyRef}
-                    className="body-input"
-                    value={currentNote.content}
-                    onChange={(_, data) => updateCurrent({ content: data.value })}
-                    placeholder={'Start writing…\n\nA few shortcuts:\n• Use **bold** or *italic* Markdown\n• Add - [ ] for a checklist item\n• Add # at the start of a line for a heading'}
-                    aria-label="Note content"
-                    resize="none"
-                  />
+                  {editorMode === 'write' ? (
+                    <Textarea
+                      ref={bodyRef}
+                      className="body-input"
+                      value={currentNote.content}
+                      onChange={(_, data) => updateCurrent({ content: data.value })}
+                      placeholder={'Start writing…\n\nA few shortcuts:\n• Use **bold** or *italic* Markdown\n• Add - [ ] for a checklist item\n• Add # at the start of a line for a heading'}
+                      aria-label="Note content"
+                      resize="none"
+                    />
+                  ) : (
+                    <div className="markdown-preview" aria-label="Formatted note preview">
+                      {currentNote.content.trim()
+                        ? renderMarkdown(currentNote.content)
+                        : <p className="markdown-empty">Nothing to preview yet. Switch back to Write to add some text.</p>}
+                    </div>
+                  )}
 
                   <div className="editor-footer">
                     <span>{noteWords} {noteWords === 1 ? 'word' : 'words'} <span className="footer-separator">·</span> {noteChars} characters</span>
