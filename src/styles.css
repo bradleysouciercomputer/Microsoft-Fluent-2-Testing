@@ -124,6 +124,7 @@ button, input, textarea, select { font: inherit; }
 .m3-badge[data-size="small"] { min-height: 21px; padding: 1px 7px; font-size: 10px; }
 .mini-tag { overflow: hidden; text-overflow: ellipsis; max-width: 75px; }
 .list-empty { min-height: 230px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--md-sys-color-on-surface-variant); }
+.list-empty > .m3-text.m3-weight-semibold { color: var(--md-sys-color-on-surface); }
 .empty-icon { width: 58px; height: 58px; display: flex; align-items: center; justify-content: center; border-radius: var(--md-sys-shape-corner-xl); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); margin-bottom: 16px; }
 .list-empty p { max-width: 250px; font-size: 13px; line-height: 20px; margin: 8px 0 17px; color: var(--md-sys-color-on-surface-variant); }
 .list-footer { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; border-top: 1px solid var(--md-sys-color-outline-variant); font-size: 11px; color: var(--md-sys-color-on-surface-variant); }
