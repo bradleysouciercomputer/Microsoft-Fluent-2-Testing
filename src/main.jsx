@@ -133,9 +133,11 @@ function App() {
   const [storageAvailable, setStorageAvailable] = useState(true);
   const [mobileShowEditor, setMobileShowEditor] = useState(false);
   const [editorMode, setEditorMode] = useState('write');
+  const [backupMenuOpen, setBackupMenuOpen] = useState(false);
   const searchRef = useRef(null);
   const bodyRef = useRef(null);
   const importRef = useRef(null);
+  const backupMenuRef = useRef(null);
 
   useEffect(() => {
     try {
@@ -159,6 +161,20 @@ function App() {
     const timer = window.setTimeout(() => setStatus(''), 2600);
     return () => window.clearTimeout(timer);
   }, [status]);
+
+  useEffect(() => {
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) metaThemeColor.setAttribute('content', themeMode === 'dark' ? '#141218' : '#fef7ff');
+  }, [themeMode]);
+
+  useEffect(() => {
+    if (!backupMenuOpen) return undefined;
+    function closeBackupMenu(event) {
+      if (!backupMenuRef.current?.contains(event.target)) setBackupMenuOpen(false);
+    }
+    document.addEventListener('pointerdown', closeBackupMenu);
+    return () => document.removeEventListener('pointerdown', closeBackupMenu);
+  }, [backupMenuOpen]);
 
   const visibleNotes = useMemo(() => {
     const text = query.trim().toLocaleLowerCase();
@@ -247,7 +263,11 @@ function App() {
     setStatus('New note created');
     window.setTimeout(() => {
       const titleField = document.querySelector('.title-input');
-      if (titleField && typeof titleField.focus === 'function') titleField.focus();
+      if (titleField && typeof titleField.focus === 'function') {
+        titleField.focus();
+        const innerTitleField = titleField.shadowRoot?.querySelector('input, textarea');
+        if (innerTitleField) innerTitleField.focus();
+      }
     }, 40);
   }
 
@@ -378,7 +398,7 @@ function App() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'fluent-notes-backup.json';
+    anchor.download = 'material-notes-backup.json';
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
@@ -422,7 +442,7 @@ function App() {
       setMobileShowEditor(Boolean(imported.length));
       setStatus('Backup imported');
     } catch (error) {
-      window.alert('Could not import this file. Choose a Fluent Notes JSON backup. ' + (error && error.message ? error.message : ''));
+      window.alert('Could not import this file. Choose a Material Notes JSON backup. ' + (error && error.message ? error.message : ''));
     } finally {
       event.target.value = '';
     }
@@ -431,6 +451,13 @@ function App() {
   useEffect(() => {
     function handleShortcut(event) {
       const modifier = event.ctrlKey || event.metaKey;
+      const eventPath = typeof event.composedPath === 'function' ? event.composedPath() : [event.target, document.activeElement];
+      const isTextEntry = eventPath.some((element) => {
+        if (!element || typeof element !== 'object') return false;
+        const tagName = typeof element.tagName === 'string' ? element.tagName.toUpperCase() : '';
+        return ['INPUT', 'TEXTAREA', 'SELECT'].includes(tagName) ||
+          element.isContentEditable === true || element.getAttribute?.('role') === 'textbox';
+      });
       if (modifier && event.key.toLowerCase() === 'n') {
         event.preventDefault();
         createNote();
@@ -440,16 +467,17 @@ function App() {
       } else if (modifier && event.key.toLowerCase() === 's') {
         event.preventDefault();
         setStatus(storageAvailable ? 'Your notes are saved on this device' : 'Browser storage is unavailable');
-      } else if (event.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && !modifier) {
+      } else if (event.key === '/' && !isTextEntry && !modifier && !event.altKey) {
         event.preventDefault();
         searchRef.current?.focus();
       } else if (event.key === 'Escape') {
         setColorMenuOpen(false);
+        setBackupMenuOpen(false);
       }
     }
     window.addEventListener('keydown', handleShortcut);
     return () => window.removeEventListener('keydown', handleShortcut);
-  });
+  }, [storageAvailable]);
 
   const noteWords = currentNote && currentNote.content.trim()
     ? currentNote.content.trim().split(/\s+/).length
@@ -469,7 +497,7 @@ function App() {
         <header className="topbar">
           <div className="topbar-brand">
             <span className="brand-mark"><Icon name="notes" size={22} /></span>
-            <Text as="span" className="brand-name" weight="semibold">Fluent Notes</Text>
+            <Text as="span" className="brand-name" weight="semibold">Material Notes</Text>
           </div>
           <div className="topbar-search">
             <Icon name="search" size={18} />
@@ -489,6 +517,29 @@ function App() {
               <span className="save-dot" />
               {storageAvailable ? <Text as="span">Saved on this device</Text> : <Text as="span">Storage unavailable</Text>}
             </span>
+            <div className="mobile-backup-wrap" ref={backupMenuRef}>
+              <Tooltip content="Backup and restore notes" relationship="label">
+                <Button
+                  appearance="subtle"
+                  className="icon-button mobile-backup-trigger"
+                  aria-label="Open backup options"
+                  aria-haspopup="menu"
+                  aria-expanded={backupMenuOpen}
+                  onClick={() => setBackupMenuOpen((open) => !open)}
+                ><Icon name="more" /></Button>
+              </Tooltip>
+              {backupMenuOpen && (
+                <div className="backup-menu" role="menu" aria-label="Backup options">
+                  <Text as="span" className="backup-menu-caption">Keep a copy of your notes</Text>
+                  <Button appearance="subtle" className="backup-menu-button" role="menuitem" onClick={() => { setBackupMenuOpen(false); exportBackup(); }}>
+                    <Icon name="download" size={17} /> Export backup
+                  </Button>
+                  <Button appearance="subtle" className="backup-menu-button" role="menuitem" onClick={() => { setBackupMenuOpen(false); importRef.current?.click(); }}>
+                    <Icon name="upload" size={17} /> Import backup
+                  </Button>
+                </div>
+              )}
+            </div>
             <Tooltip content={themeMode === 'dark' ? 'Use light theme' : 'Use dark theme'} relationship="label">
               <Button
                 appearance="subtle"
@@ -560,7 +611,7 @@ function App() {
                 <Button appearance="subtle" className="backup-button" onClick={() => importRef.current?.click()}>
                   <Icon name="upload" size={16} /> Import backup
                 </Button>
-                <input ref={importRef} className="visually-hidden" type="file" accept=".json,application/json" onChange={importBackup} aria-label="Import Fluent Notes backup" />
+                <input ref={importRef} className="visually-hidden" type="file" accept=".json,application/json" onChange={importBackup} aria-label="Import Material Notes backup" />
               </div>
               <div className="keyboard-tip"><Badge appearance="outline" size="small" className="keyboard-badge">Ctrl</Badge><Text as="span">+</Text><Badge appearance="outline" size="small" className="keyboard-badge">N</Badge><Text as="span">New note</Text></div>
             </div>
