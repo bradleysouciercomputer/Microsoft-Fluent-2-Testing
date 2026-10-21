@@ -138,6 +138,7 @@ function App() {
   const bodyRef = useRef(null);
   const importRef = useRef(null);
   const backupMenuRef = useRef(null);
+  const colorPickerRef = useRef(null);
 
   useEffect(() => {
     try {
@@ -175,6 +176,15 @@ function App() {
     document.addEventListener('pointerdown', closeBackupMenu);
     return () => document.removeEventListener('pointerdown', closeBackupMenu);
   }, [backupMenuOpen]);
+
+  useEffect(() => {
+    if (!colorMenuOpen) return undefined;
+    function closeColorMenu(event) {
+      if (!colorPickerRef.current?.contains(event.target)) setColorMenuOpen(false);
+    }
+    document.addEventListener('pointerdown', closeColorMenu);
+    return () => document.removeEventListener('pointerdown', closeColorMenu);
+  }, [colorMenuOpen]);
 
   const visibleNotes = useMemo(() => {
     const text = query.trim().toLocaleLowerCase();
@@ -785,7 +795,7 @@ function App() {
                         <Text as="span">{editorMode === 'preview' ? 'Write' : 'Preview'}</Text>
                       </Button>
                     </div>
-                    <div className="color-picker-wrap">
+                    <div className="color-picker-wrap" ref={colorPickerRef}>
                       <Tooltip content="Note color" relationship="label">
                         <Button appearance="subtle" className="format-button color-trigger" onClick={() => setColorMenuOpen((open) => !open)} aria-label="Choose note color" aria-expanded={colorMenuOpen}>
                           <span className={'color-dot color-dot-' + (currentNote.color || 'default')} />
